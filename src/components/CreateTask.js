@@ -5,6 +5,7 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
 import axios from "axios";
+// import {useNavigate } from "react-router-dom";
 
 
 export default function Flight() {
@@ -15,13 +16,18 @@ export default function Flight() {
     const [password, setPassword] = useState('')
     const [tasks, setTasks] = useState([])
     const [owner, setowner] = useState('');
+    // let navigate = useNavigate();
+
 
 
     const handleClick = (e) => {
         e.preventDefault()
         const task = {name,email,password, description, owner}
 
-        axios.post("http://localhost:8080/home/createTask", task);
+        axios.post("http://localhost:8080/home/signUp", task)
+            .then(()=>{
+                // navigate("/")
+            })
 
         //
         // fetch("http://localhost:8080/home/createTask",{
@@ -76,6 +82,7 @@ export default function Flight() {
                         <Button variant="contained" color="success" onClick={handleClick} fullWidth>
                             Submit
                         </Button>
+
                     </from>
                 </Paper>
 
