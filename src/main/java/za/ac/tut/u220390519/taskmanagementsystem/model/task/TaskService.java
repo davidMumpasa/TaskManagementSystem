@@ -1,7 +1,8 @@
-package za.ac.tut.u220390519.taskmanagementsystem.model;
+package za.ac.tut.u220390519.taskmanagementsystem.model.task;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import za.ac.tut.u220390519.taskmanagementsystem.exception.UserNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,16 +16,11 @@ public class TaskService {
     private TaskRepository taskRepository;
 
     public void createTask(Task task){
+
         taskRepository.save(task);
 
     }
 
-    public Task findTask(String email){
-
-        Optional<Task> task = taskRepository.findAllByEmail(email);
-
-        return task.get();
-    }
 
     public void deleteTask(Task task){
         taskRepository.delete(task);
@@ -43,4 +39,10 @@ public class TaskService {
         return tasks;
     }
 
+    public Task findTaskByName(String name){
+       Task task = taskRepository.findByName(name)
+               .orElseThrow(() -> new UserNotFoundException(name));;
+
+       return task;
+    }
 }
