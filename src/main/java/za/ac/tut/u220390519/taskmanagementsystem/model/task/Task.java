@@ -1,8 +1,11 @@
 package za.ac.tut.u220390519.taskmanagementsystem.model.task;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.util.Date;
 
+@JsonIgnoreProperties(value = {"hibernateLazyInitializer","handler"})
 @Entity
 public class Task {
 

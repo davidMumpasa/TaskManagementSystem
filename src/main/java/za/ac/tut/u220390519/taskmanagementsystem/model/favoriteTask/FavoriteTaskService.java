@@ -23,13 +23,20 @@ public class FavoriteTaskService {
 
     public FavoriteTask findFavoriteByTask(Task task){
          FavoriteTask favoriteTask = favoriteTaskRepository.findByTask(task)
-                .orElseThrow(() -> new UserNotFoundException(task.getName()));;
+                .orElseThrow(() -> new UserNotFoundException(task.getName()));
 
         return favoriteTask;
     }
 
     public void deleteFavoriteTask(FavoriteTask favoriteTask){
         favoriteTaskRepository.delete(favoriteTask);
+    }
+
+    public FavoriteTask findFavoriteTAskById(Long id){
+        FavoriteTask favoriteTask = favoriteTaskRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id.toString()));
+
+                return favoriteTask;
     }
 
     public List<FavoriteTask> viewAllFavoriteTasks(){

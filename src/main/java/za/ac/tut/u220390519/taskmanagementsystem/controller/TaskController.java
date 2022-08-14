@@ -47,7 +47,7 @@ public class TaskController {
                     message = "1";
 
                 } catch (UserNotFoundException exception){
-                    message = exception.getMessage()+"\n"+"Please make sure the Owner's name is correct";
+                    message = "Please make sure the Owner's name is correct";
                 }
 
 
@@ -196,13 +196,13 @@ public class TaskController {
 
         String description = request.getParameter("description");
         String owner = request.getParameter("owner");
-        //String id = request.getParameter("id");
+        String name = request.getParameter("taskname");
 
         System.out.println("task owner"+owner+"\n"+
                 " name"+ taskName+"\n"+"description"+
                 description);
 
-        task.setName(taskName);
+        task.setName(name);
         task.setCreationDate(new Date());
         task.setDescription(description);
         task.setOwner(owner);
@@ -256,30 +256,49 @@ public class TaskController {
     public String resetPassword(HttpServletRequest request) {
 
 
-        String message ="",foundPassword;
+        String message ="";
 
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-        String newPassword = request.getParameter("password");
-
-        System.out.println(email+"  "+ password);
+        String reTypedPassword = request.getParameter("retypedPassword");
 
         try{
             User user = userService.findUser(email);
 
-            foundPassword = user.getPassword();
 
-            if(foundPassword.equals(password) && user.getEmail().equals(email)){
+           if(password.equals(reTypedPassword)){
 
-                message= "1";
-            } else {
-                message="2";
-            }
+               user.setPassword(reTypedPassword);
+               userService.createUser(user);
+
+               message = "password successfully reset";
+           } else {
+               message = "2";
+           }
 
         }catch (UserNotFoundException e){
             message = "3";
         }
 
+
+        return message;
+    }
+
+    @PostMapping(value = "/deleteFavoriteTask/{id}")
+    public String deleteFavoriteTask(@PathVariable Long id){
+        String message="";
+
+//        Long id = Long.parseLong(request.getParameter("id"));
+
+        try {
+            FavoriteTask favoriteTask = favoriteTaskService.findFavoriteTAskById(id);
+            favoriteTaskService.deleteFavoriteTask(favoriteTask);
+            message = "Task successfully removed as favorite";
+
+
+        }catch (UserNotFoundException exception){
+            message = exception.getMessage();
+        }
 
         return message;
     }
