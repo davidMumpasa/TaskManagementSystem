@@ -44,7 +44,7 @@ public class TaskController {
 
                     task.setCreationDate(new Date());
                     taskService.createTask(task);
-                    message = "New task has been added";
+                    message = "1";
 
                 } catch (UserNotFoundException exception){
                     message = exception.getMessage()+"\n"+"Please make sure the Owner's name is correct";
@@ -59,7 +59,7 @@ public class TaskController {
 
                 task.setCreationDate(new Date());
                 taskService.createTask(task);
-                message = "New task has been added";
+                message = "1";
 
             } catch (UserNotFoundException exception){
                 message = exception.getMessage()+"\n"+"Please make sure the Owner's name is correct";
@@ -73,16 +73,29 @@ public class TaskController {
     public String createUser(@RequestBody User user){
         String message ="";
 
-        List <User> users = userService.getAllUsers();
+        try{
+            User newUser = userService.findUserByUserName(user.getUsername());
 
-        for(User user1:users){
-            if(user1.equals(user)){
-                message = "This user already exit";
+            if(newUser.getSurname().equals(user.getSurname()) && newUser.getEmail().equals(user.getEmail()) &&
+            newUser.getAddress().equals(user.getAddress())){
+                message = "User Already exists";
             } else {
                 userService.createUser(user);
-                message = "User has been successfully created";
+                message = "1";
             }
+
+
+        } catch (UserNotFoundException exception){
+
+                userService.createUser(user);
+                message = "1";
+
         }
+
+
+
+
+
         return message;
     }
 
@@ -134,7 +147,17 @@ public class TaskController {
 
         Task task = taskService.findTaskByName(taskName);
 
-        taskService.deleteTask(task);
+        try {
+            FavoriteTask favoriteTask = favoriteTaskService.findFavoriteByTask(task);
+            favoriteTaskService.deleteFavoriteTask(favoriteTask);
+            taskService.deleteTask(task);
+
+        }catch (UserNotFoundException exception){
+            taskService.deleteTask(task);
+        }
+
+
+
 
         return "Task successfully deleted";
     }
@@ -164,28 +187,31 @@ public class TaskController {
     }
 
     @PostMapping("/editTask")
-    public String editTask(@RequestBody Task task,Task newTask){
-       // String taskName;
+    public String editTask(HttpServletRequest request){
+        String taskName;
 
-//        taskName = request.getParameter("taskName");
-//
-//        Task task = taskService.findTaskByName(taskName);
+        taskName = request.getParameter("name");
 
+        Task task = taskService.findTaskByName(taskName);
 
-//        String description = request.getParameter("description");
-//        String name = request.getParameter("name");
-//        String owner = request.getParameter("owner");
+        String description = request.getParameter("description");
+        String owner = request.getParameter("owner");
+        //String id = request.getParameter("id");
 
-        task.setName(newTask.getName());
+        System.out.println("task owner"+owner+"\n"+
+                " name"+ taskName+"\n"+"description"+
+                description);
+
+        task.setName(taskName);
         task.setCreationDate(new Date());
-        task.setDescription(newTask.getDescription());
-        task.setOwner(newTask.getOwner());
+        task.setDescription(description);
+        task.setOwner(owner);
         taskService.createTask(task);
+
         System.out.println("task owner"+task.getOwner()+"/n"+
                 " name"+ task.getName()+"/n"+"time"+
                 task.getCreationDate()+
                 ""+task.getDescription());
-
 
         return " Task successfully edited";
 }
@@ -193,28 +219,70 @@ public class TaskController {
     @PostMapping("/favoriteTask")
     public String addTaskToFavoriteList(HttpServletRequest request){
         String taskName,message="";
+        Task task = null;
 
         taskName = request.getParameter("taskName");
 
         FavoriteTask favoriteTask = new FavoriteTask();
-        Task task = taskService.findTaskByName(taskName);
 
-        List<FavoriteTask> favoriteTasks = favoriteTaskService.viewAllFavoriteTasks();
+        try{
 
-        for(FavoriteTask favoriteTask1:favoriteTasks){
-             if(favoriteTask1.getTask().getId().equals(task.getId())){
-                 message = "The task has already been added";
-             } else{
+            task = taskService.findTaskByName(taskName);
 
-                 System.out.println("name:"+task.getName());
-                 favoriteTask.setTask(task);
+            FavoriteTask newFavorite = favoriteTaskService.findFavoriteByTask(task);
 
-                 favoriteTaskService.createFavoriteTask(favoriteTask);
-                 message = "new task has been successfully added";
-             }
+            message = "The task has already been added has favorite";
+
+        } catch (UserNotFoundException exception){
+
+            favoriteTask.setTask(task);
+            favoriteTaskService.createFavoriteTask(favoriteTask);
+            message = "1";
         }
 
         return message;
     }
+
+    @GetMapping("/getAllFavoritesTasks")
+    public List<FavoriteTask> getAllFavoriteTasks(){
+
+        List<FavoriteTask> favoriteTasks = favoriteTaskService.viewAllFavoriteTasks();
+
+        return favoriteTasks;
+    }
+
+
+    @PostMapping("/resetPassword")
+    public String resetPassword(HttpServletRequest request) {
+
+
+        String message ="",foundPassword;
+
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        String newPassword = request.getParameter("password");
+
+        System.out.println(email+"  "+ password);
+
+        try{
+            User user = userService.findUser(email);
+
+            foundPassword = user.getPassword();
+
+            if(foundPassword.equals(password) && user.getEmail().equals(email)){
+
+                message= "1";
+            } else {
+                message="2";
+            }
+
+        }catch (UserNotFoundException e){
+            message = "3";
+        }
+
+
+        return message;
+    }
+
 
 }

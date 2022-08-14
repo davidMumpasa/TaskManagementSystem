@@ -7,7 +7,6 @@ import za.ac.tut.u220390519.taskmanagementsystem.exception.UserNotFoundException
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class TaskService {
@@ -22,7 +21,7 @@ public class TaskService {
     }
 
 
-    public void deleteTask(Task task){
+    public void deleteTask(Task task) {
         taskRepository.delete(task);
     }
 
@@ -41,7 +40,7 @@ public class TaskService {
 
     public Task findTaskByName(String name){
        Task task = taskRepository.findByName(name)
-               .orElseThrow(() -> new UserNotFoundException(name));;
+               .orElseThrow(() -> new UserNotFoundException(name));
 
        return task;
     }

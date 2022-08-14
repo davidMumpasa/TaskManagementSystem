@@ -3,6 +3,7 @@ package za.ac.tut.u220390519.taskmanagementsystem.model.favoriteTask;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import za.ac.tut.u220390519.taskmanagementsystem.exception.UserNotFoundException;
 import za.ac.tut.u220390519.taskmanagementsystem.model.task.Task;
 
 import java.util.ArrayList;
@@ -20,10 +21,11 @@ public class FavoriteTaskService {
         favoriteTaskRepository.save(favoriteTask);
     }
 
-    public FavoriteTask findFavoriteTask(Long id){
-        Optional<FavoriteTask> favoriteTask = favoriteTaskRepository.findById(id);
+    public FavoriteTask findFavoriteByTask(Task task){
+         FavoriteTask favoriteTask = favoriteTaskRepository.findByTask(task)
+                .orElseThrow(() -> new UserNotFoundException(task.getName()));;
 
-        return favoriteTask.get();
+        return favoriteTask;
     }
 
     public void deleteFavoriteTask(FavoriteTask favoriteTask){
